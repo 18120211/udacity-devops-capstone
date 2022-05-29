@@ -1,0 +1,9 @@
+- name: build-docker-image
+  hosts: agent
+  user: ubuntu
+  become: true
+  become_method: sudo
+  become_user: root
+  
+  roles:
+    - build-docker-image
