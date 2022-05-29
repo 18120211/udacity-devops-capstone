@@ -2,20 +2,25 @@ version: 2.1
 jobs:
   build-docker-image:
     docker:
-      - image: 18120211/udacity-capstone:latest
+      - image: docker:20.10.16-git
     steps:
       - checkout
       - run:
           name: "Build docker image"
           command: |
-            echo "Anh yeu em"
-            pwd
-            ls .
+            docker build -t ${DOCKER_IMAGE} nginx/
   push-docker-image:
     docker:
-      - image: 18120211/udacity-capstone:latest
+      - image: docker:20.10.16-git
     steps:
       - checkout
+      - run:
+          name: "Login to docker hub"
+          command: docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+      - run:
+          name: "Push docker image"
+          command: |
+            docker push ${DOCKER_IMAGE}
 workflows:
   default:
     jobs:
