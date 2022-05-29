@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: udacity
+  name: udacity-nginx
+spec:
+  selector:
+    matchLabels:
+      app: udacity
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: udacity
+      name: udacity-nginx
+    spec:
+      containers:
+        - name: udacity-nginx
+          image: 18120211/udacity-nginx:test
+          ports:
+            - containerPort: 80
+          imagePullPolicy: Always
+status: {}
