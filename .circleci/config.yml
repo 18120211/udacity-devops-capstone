@@ -1,5 +1,28 @@
 version: 2.1
 jobs:
-  build:
+  build-docker-image:
     docker:
-      - image: 
+      - image: 18120211/udacity-capstone:latest
+    steps:
+      - checkout
+      - run:
+          name: "Build docker image"
+          command: |
+            echo "Anh yeu em"
+            pwd
+            ls .
+  push-docker-image:
+    docker:
+      - image: 18120211/udacity-capstone:latest
+    steps:
+      - checkout
+workflows:
+  default:
+    jobs:
+      - build-docker-image:
+          filters:
+            branches:
+              only: [main]
+      - push-docker-image:
+          requires:
+            - build-docker-image
