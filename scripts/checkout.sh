@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd ~/project
+cd /home/ubuntu/project
 git pull
