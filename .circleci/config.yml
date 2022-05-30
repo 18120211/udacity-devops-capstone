@@ -17,10 +17,9 @@ jobs:
             pwd
             ls
             echo "-----------------"
-            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} 
-            pwd
-            ls
-            docker build -t ${DOCKER_IMAGE} nginx/
+            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} ~/scripts/checkout.sh
+            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} ~/scripts/build-docker-image.sh ${DOCKER_IMAGE}
+            
   push-docker-image:
     docker:
       - image: 18120211/aws-ansible-22.04
@@ -41,9 +40,8 @@ jobs:
             pwd
             ls
             echo "-----------------"
-            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} 
-            docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
-            docker push ${DOCKER_IMAGE}
+            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} ~/scripts/checkout.sh
+            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} ~/scripts/push-docker-image.sh ${DOCKER_IMAGE} ${CIRCLE_SHA1}
 workflows:
   default:
     jobs:
