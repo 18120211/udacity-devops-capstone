@@ -23,15 +23,26 @@ jobs:
             docker build -t ${DOCKER_IMAGE} nginx/
   push-docker-image:
     docker:
-      - image: 
+      - image: 18120211/aws-ansible-22.04
     steps:
       - checkout
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints:
+            - "36:c6:1e:19:7a:d4:77:2e:56:cc:11:6b:92:07:be:52"
       - run:
           name: "Login to docker hub"
           command: docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
       - run:
           name: "Push docker image"
           command: |
+            export BUILD_AGENT=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=build-agent" --query 'Reservations[*].Instances[0].PublicIpAddress' --output text)
+            echo "Build agent: ${BUILD_AGENT}"
+            pwd
+            ls
+            echo "-----------------"
+            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} 
+            docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
             docker push ${DOCKER_IMAGE}
 workflows:
   default:
