@@ -17,8 +17,8 @@ jobs:
             pwd
             ls
             echo "-----------------"
-            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/scripts/checkout.sh
-            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/scripts/build-docker-image.sh ${DOCKER_IMAGE}
+            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/checkout.sh
+            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/build-docker-image.sh ${DOCKER_IMAGE}
             
   push-docker-image:
     docker:
@@ -40,8 +40,8 @@ jobs:
             pwd
             ls
             echo "-----------------"
-            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/scripts/checkout.sh
-            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/scripts/push-docker-image.sh ${DOCKER_IMAGE} ${CIRCLE_SHA1}
+            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/checkout.sh
+            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/push-docker-image.sh ${DOCKER_IMAGE} ${CIRCLE_SHA1}
 workflows:
   default:
     jobs:
