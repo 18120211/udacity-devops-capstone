@@ -17,9 +17,9 @@ jobs:
             pwd
             ls
             echo "-----------------"
-            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/checkout.sh
-            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/build-docker-image.sh ${DOCKER_IMAGE} ${CIRCLE_SHA1}
-            
+            ssh -o StrictHostKeyChecking=no ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/checkout.sh
+            ssh -o StrictHostKeyChecking=no ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/build-docker-image.sh ${DOCKER_IMAGE} ${CIRCLE_SHA1}
+
   push-docker-image:
     docker:
       - image: 18120211/aws-ansible-22.04
@@ -30,9 +30,6 @@ jobs:
           fingerprints:
             - "36:c6:1e:19:7a:d4:77:2e:56:cc:11:6b:92:07:be:52"
       - run:
-          name: "Login to docker hub"
-          command: 
-      - run:
           name: "Push docker image"
           command: |
             export BUILD_AGENT=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=build-agent" --query 'Reservations[*].Instances[0].PublicIpAddress' --output text)
@@ -40,8 +37,8 @@ jobs:
             pwd
             ls
             echo "-----------------"
-            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/checkout.sh
-            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/push-docker-image.sh ${DOCKER_IMAGE} ${DOCKER_USERNAME} ${DOCKER_PASSWORD}
+            ssh -o StrictHostKeyChecking=no ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/checkout.sh
+            ssh -o StrictHostKeyChecking=no ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/push-docker-image.sh ${DOCKER_IMAGE} ${DOCKER_USERNAME} ${DOCKER_PASSWORD}
 workflows:
   default:
     jobs:
