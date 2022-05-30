@@ -18,7 +18,7 @@ jobs:
             ls
             echo "-----------------"
             ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/checkout.sh
-            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/build-docker-image.sh ${DOCKER_IMAGE}
+            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/build-docker-image.sh ${DOCKER_IMAGE} ${CIRCLE_SHA1}
             
   push-docker-image:
     docker:
@@ -31,7 +31,7 @@ jobs:
             - "36:c6:1e:19:7a:d4:77:2e:56:cc:11:6b:92:07:be:52"
       - run:
           name: "Login to docker hub"
-          command: docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+          command: 
       - run:
           name: "Push docker image"
           command: |
@@ -41,7 +41,7 @@ jobs:
             ls
             echo "-----------------"
             ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/checkout.sh
-            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/push-docker-image.sh ${DOCKER_IMAGE} ${CIRCLE_SHA1}
+            ssh -o StrictHostKeyChecking=no -i udacity.pem ubuntu@${BUILD_AGENT} /home/ubuntu/project/scripts/push-docker-image.sh ${DOCKER_IMAGE} ${DOCKER_USERNAME} ${DOCKER_PASSWORD}
 workflows:
   default:
     jobs:

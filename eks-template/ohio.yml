@@ -1,0 +1,21 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: udacity-cluster
+  region: us-east-2
+
+vpc:
+  subnets:
+    public:
+      us-east-1c: { id: subnet-09f128fd037c97c71 }
+      us-east-1b: { id: subnet-0a6c6192ecdb4661f }
+      us-east-1a: { id: subnet-09628744c79fb22e9 }
+
+nodeGroups:
+  - name: ng-1
+    instanceType: t3.micro
+    desiredCapacity: 1
+    volumeSize: 20
+    ssh:
+      publicKeyName: udacity-ohio

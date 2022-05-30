@@ -1,4 +1,7 @@
 #!/bin/bash
 
 DOCKER_IMAGE=$1
+DOCKER_USERNAME=$2
+DOCKER_PASSWORD=$3
+docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
 docker push ${DOCKER_IMAGE}
