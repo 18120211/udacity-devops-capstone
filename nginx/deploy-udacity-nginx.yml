@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: udacity-nginx
-          image: 18120211/udacity-nginx:test
+          image: 18120211/udacity-nginx:latest
           ports:
             - containerPort: 80
           imagePullPolicy: Always
