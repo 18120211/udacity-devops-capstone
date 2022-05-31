@@ -23,11 +23,11 @@ Parameters:
     Default: build-agent
 Resources:
   ############ Create security group #############
-  WebServerSecGroup:
+  BuildAgentSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: "Web server security group" # Required
-      GroupName: "Web-server-sg"
+      GroupName: !Sub ${Namespace}-sg
       SecurityGroupEgress:
         - IpProtocol: tcp
           FromPort: 0
@@ -38,8 +38,7 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0
-      VpcId:
-        Fn::ImportValue: !Sub ${Namespace}-VPCID
+      VpcId: vpc-06fc722aef119f54b	
 
   ############ Create Instance Profile and IAM role, IAM policy ################
   EC2InstanceRole:
@@ -71,15 +70,17 @@ Resources:
   BuildAgent:
     Type: AWS::EC2::Instance
     Properties:
-      AvailabilityZone: "String"
       IamInstanceProfile: !Ref EC2InstanceProfile
       ImageId: !Ref ImageId
       InstanceType: !Ref InstanceType
       KeyName: !Ref KeyName
-      SecurityGroups:
-        SecurityGroups
+      # SecurityGroups: 
+      #   - !Ref BuildAgentSG
+      SecurityGroupIds:
+        - !GetAtt BuildAgentSG.GroupId
       Tags:
-        Name: !Ref EC2Name
+        - Key: "Name"
+          Value: "build-agent"
       UserData: 
         Fn::Base64: !Sub |
           #!bin/bash
