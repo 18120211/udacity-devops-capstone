@@ -64,3 +64,6 @@ workflows:
       - push-docker-image:
           requires:
             - build-docker-image
+      - update-application-in-eks:
+          requires:
+            - push-docker-image
