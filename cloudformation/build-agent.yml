@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: |
+  This is my server infrastructure
+Parameters:
+  Namespace:
+    Description: Application namespace
+    Type: String
+    Default: udacity-capstone
+  KeyName:
+    Type: String
+    Default: udacity
+  ImageId:
+    Type: String
+    Default: ami-09d56f8956ab235b3
+  InstanceType:
+    Type: String
+    Default: t3.medium
+  AdminAccessPolicy:
+    Type: String
+    Default: arn:aws:iam::aws:policy/AdministratorAccess
+  EC2Name:
+    Type: String
+    Default: build-agent
+Resources:
+  ############ Create security group #############
+  WebServerSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Web server security group" # Required
+      GroupName: "Web-server-sg"
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      VpcId:
+        Fn::ImportValue: !Sub ${Namespace}-VPCID
+
+  ############ Create Instance Profile and IAM role, IAM policy ################
+  EC2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${Namespace}-ec2-s3-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - !Ref AdminAccessPolicy
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub ${Namespace}-ec2-s3-profile
+      Path: /
+      Roles:
+        - !Ref EC2InstanceRole
+
+  ################### Create Web server LaunchConfiguration and Web server auto scaling group ##################
+  BuildAgent:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: "String"
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      ImageId: !Ref ImageId
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      SecurityGroups:
+        SecurityGroups
+      Tags:
+        Name: !Ref EC2Name
+      UserData: 
+        Fn::Base64: !Sub |
+          #!bin/bash
+          apt-get update -y
+          ### Install docker
+          apt-get install -y \
+            ca-certificates \
+            curl \
+            gnupg \
+            lsb-release 
+          mkdir -p /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+            $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+          apt-get update -y
+          apt-get install -y \
+            docker-ce \
+            docker-ce-cli \
+            containerd.io \
+            docker-compose-plugin
+          
+          #### Install kubectl
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          mv ./kubectl /usr/local/bin/kubectl
+          kubectl version
+
+          #### Install GCP SDK
+          apt-get install -y \
+            apt-transport-https \
+            ca-certificates \
+            gnupg
+          echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+          apt-get update -y && \
+          apt-get install -y \
+            google-cloud-cli
+      BlockDeviceMappings:
+        - DeviceName: /dev/sdk
+          Ebs:
+            VolumeSize: 20
