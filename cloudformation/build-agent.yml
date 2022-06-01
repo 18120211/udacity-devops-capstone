@@ -23,7 +23,7 @@ Parameters:
     Default: build-agent
 Resources:
   ############ Create security group #############
-  BuildAgentSG:
+  AppAgentSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: "Web server security group" # Required
@@ -75,9 +75,9 @@ Resources:
       InstanceType: !Ref InstanceType
       KeyName: !Ref KeyName
       # SecurityGroups: 
-      #   - !Ref BuildAgentSG
+      #   - !Ref AppAgentSG
       SecurityGroupIds:
-        - !GetAtt BuildAgentSG.GroupId
+        - !GetAtt AppAgentSG.GroupId
       Tags:
         - Key: "Name"
           Value: "build-agent"
@@ -119,7 +119,7 @@ Resources:
           apt-get update -y && \
           apt-get install -y \
             google-cloud-cli
-            
+
           ### Install Hadolint
           wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
           chmod +x /bin/hadolint
