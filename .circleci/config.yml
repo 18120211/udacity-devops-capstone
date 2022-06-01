@@ -10,7 +10,7 @@ jobs:
           fingerprints:
             - "36:c6:1e:19:7a:d4:77:2e:56:cc:11:6b:92:07:be:52"
       - run:
-          name: "Liniting"
+          name: "Checkout"
           command: |
             export BUILD_AGENT=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=build-agent" --query 'Reservations[*].Instances[0].PublicIpAddress' --output text)
             echo "Build agent: ${BUILD_AGENT}"
