@@ -84,10 +84,16 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-docker-image:
+      - checkout:
           filters:
-            branches:
-              only: [main]
+              branches:
+                only: [main]
+      - linting-docker-syntax:
+          requires:
+            - checkout
+      - build-docker-image:
+          requires:
+            - linting-docker-syntax
       - push-docker-image:
           requires:
             - build-docker-image
